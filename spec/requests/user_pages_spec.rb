@@ -50,12 +50,6 @@ describe "User pages" do
       end
     end
 
-    it "should list each user" do
-      User.all.each do |user|
-        page.should have_selector('li', text: user.name)
-      end
-    end
-
     describe "follow/unfollow buttons" do
       let(:other_user) { FactoryGirl.create(:user) }
       before { sign_in user }
@@ -164,6 +158,13 @@ describe "User pages" do
       it "should not create a user" do
         expect { click_button submit }.not_to change(User, :count)
       end
+      
+      describe "error messages" do
+        before { click_button submit }
+
+        it { should have_selector('title', text: 'Sign up') }
+        it { should have_content('error') }
+      end
     end
 
     describe "with valid information" do
@@ -171,7 +172,7 @@ describe "User pages" do
         fill_in "Name",         with: "Example User"
         fill_in "Email",        with: "user@example.com"
         fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
+        fill_in "Confirm Password", with: "foobar"
       end
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
@@ -214,6 +215,5 @@ describe "User pages" do
         specify { user.reload.name.should  == new_name }
         specify { user.reload.email.should == new_email }
       end
-
     end  
 end
